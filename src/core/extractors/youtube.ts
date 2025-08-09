@@ -114,7 +114,7 @@ export class YouTubeExtractor extends BaseExtractor {
     },
   };
 
-  private static readonly INNERTUBE_API_KEY = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
+  private static readonly INNERTUBE_API_KEY = process.env.YOUTUBE_API_KEY || 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
   private static readonly INNERTUBE_HOST = 'www.youtube.com';
 
   test(url: string): boolean {
