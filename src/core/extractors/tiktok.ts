@@ -409,7 +409,7 @@ export class TikTokExtractor extends BaseExtractor {
                    console.log(`${key} keys:`, Object.keys(value));
                    if ('itemInfo' in value || 'itemStruct' in value) {
                      console.log(`Found potential video data in ${key}`);
-                     videoData = value.itemInfo?.itemStruct || value.itemStruct;
+                     videoData = ('itemInfo' in value ? (value.itemInfo as any)?.itemStruct : (value as any).itemStruct);
                      if (videoData) break;
                    }
                  }
@@ -663,7 +663,7 @@ export class TikTokExtractor extends BaseExtractor {
       if (response.ok) {
         const data = await response.json();
         console.log('Mobile API response:', data);
-        return data?.itemInfo?.itemStruct || null;
+        return (data as any)?.itemInfo?.itemStruct || null;
       }
     } catch (error) {
       console.warn('Mobile API extraction failed:', error);
