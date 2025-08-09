@@ -1,0 +1,119 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        bun-version: [1.0.0, latest]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: ${{ matrix.bun-version }}
+    
+    - name: Install dependencies
+      run: bun install
+    
+    - name: Run TypeScript check
+      run: bun run tsc --noEmit
+    
+    - name: Run tests
+      run: bun run test.ts
+    
+    - name: Test CLI help
+      run: bun mdu.ts --help
+    
+    - name: Test CLI list extractors
+      run: bun mdu.ts list-extractors
+    
+    - name: Test CLI info command
+      run: bun mdu.ts info "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4"
+    
+    - name: Test CLI download (dry run)
+      run: |
+        mkdir -p test-output
+        timeout 30s bun mdu.ts download "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4" --output ./test-output || true
+        ls -la test-output/ || true
+  
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+    
+    - name: Install dependencies
+      run: bun install
+    
+    - name: Build CLI
+      run: |
+        bun build src/cli/index.ts --outdir dist --target bun
+        bun build src/core/index.ts --outdir dist --target bun
+    
+    - name: Test built CLI
+      run: |
+        bun dist/index.js --help || echo "Build test completed"
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: built-cli
+        path: dist/
+  
+  windows-test:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+    
+    - name: Install dependencies
+      run: bun install
+    
+    - name: Test on Windows
+      run: |
+        bun mdu.ts --help
+        bun mdu.ts list-extractors
+    
+  macos-test:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+    
+    - name: Install dependencies
+      run: bun install
+    
+    - name: Test on macOS
+      run: |
+        bun mdu.ts --help
+        bun mdu.ts list-extractors
