@@ -65,13 +65,6 @@ This project is licensed under the MIT License.
 See the [LICENSE](LICENSE) file for full details.
 
 ---
-
-## Contact
-
-For support or inquiries, please contact: [info.neixproducer@gmail.com](mailto:info.neixproducer@gmail.com)
-
----
-
 ## Acknowledgments
 
 * [Electron](https://www.electronjs.org/) for the desktop shell
